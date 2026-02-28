@@ -1,13 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RAM NAVMI 2026</title>
+</head>
+<body>
+
 <h2>🚩 RAM NAVMI 2026</h2>
 
 {% if session.get("admin") %}
-<a href="/logout">Logout</a> {% else %}
-<a href="/login">Login</a> {% endif %}
+<a href="/logout">Logout</a>
+{% else %}
+<a href="/login">Login</a>
+{% endif %}
+
+<hr>
 
 <h3>Total Cash: ₹{{ total_cash }}</h3>
 <h3>Total Online: ₹{{ total_online }}</h3>
 <h3>Total Expenses: ₹{{ total_expense }}</h3>
 <h3>Net Balance: ₹{{ net }}</h3>
+
+<hr>
 
 {% if session.get("admin") %}
 <h3>Add Collection</h3>
@@ -31,17 +44,28 @@
     </select><br><br>
     <button type="submit">Add</button>
 </form>
+
+<hr>
 {% endif %}
 
+<!-- 🔍 SEARCH BAR -->
+<h3>Search Records</h3>
+<input type="text" id="searchInput" placeholder="Search by name..." 
+       onkeyup="searchTable()" 
+       style="padding:6px; width:250px;">
+
+<hr>
+
 <h3>Collections</h3>
-<table border="1">
+<table border="1" width="100%">
     <tr>
         <th>Date</th>
         <th>Name</th>
         <th>Amount</th>
         <th>Mode</th>
         {% if session.get("admin") %}
-        <th>Action</th>{% endif %}
+        <th>Action</th>
+        {% endif %}
     </tr>
 
     {% for c in collections %}
@@ -60,15 +84,18 @@
     {% endfor %}
 </table>
 
+<br>
+
 <h3>Expenses</h3>
-<table border="1">
+<table border="1" width="100%">
     <tr>
         <th>Date</th>
         <th>Name</th>
         <th>Amount</th>
         <th>Mode</th>
         {% if session.get("admin") %}
-        <th>Action</th>{% endif %}
+        <th>Action</th>
+        {% endif %}
     </tr>
 
     {% for e in expenses %}
@@ -86,3 +113,23 @@
     </tr>
     {% endfor %}
 </table>
+
+<!-- 🔥 SEARCH SCRIPT -->
+<script>
+function searchTable() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let tables = document.querySelectorAll("table");
+
+    tables.forEach(table => {
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+            let text = rows[i].innerText.toLowerCase();
+            rows[i].style.display = text.includes(input) ? "" : "none";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
