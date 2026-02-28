@@ -1,0 +1,88 @@
+<h2>🚩 RAM NAVMI 2026</h2>
+
+{% if session.get("admin") %}
+<a href="/logout">Logout</a> {% else %}
+<a href="/login">Login</a> {% endif %}
+
+<h3>Total Cash: ₹{{ total_cash }}</h3>
+<h3>Total Online: ₹{{ total_online }}</h3>
+<h3>Total Expenses: ₹{{ total_expense }}</h3>
+<h3>Net Balance: ₹{{ net }}</h3>
+
+{% if session.get("admin") %}
+<h3>Add Collection</h3>
+<form method="POST" action="/add_collection">
+    <input name="name" placeholder="Name" required><br><br>
+    <input name="amount" placeholder="Amount" required><br><br>
+    <select name="mode" required>
+        <option value="Cash">Cash</option>
+        <option value="Online">Online</option>
+    </select><br><br>
+    <button type="submit">Add</button>
+</form>
+
+<h3>Add Expense</h3>
+<form method="POST" action="/add_expense">
+    <input name="name" placeholder="Name" required><br><br>
+    <input name="amount" placeholder="Amount" required><br><br>
+    <select name="mode" required>
+        <option value="Cash">Cash</option>
+        <option value="Online">Online</option>
+    </select><br><br>
+    <button type="submit">Add</button>
+</form>
+{% endif %}
+
+<h3>Collections</h3>
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Mode</th>
+        {% if session.get("admin") %}
+        <th>Action</th>{% endif %}
+    </tr>
+
+    {% for c in collections %}
+    <tr>
+        <td>{{ c.date.strftime("%d-%m-%Y") }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.amount }}</td>
+        <td>{{ c.mode }}</td>
+        {% if session.get("admin") %}
+        <td>
+            <a href="/edit/collection/{{c.id}}">Edit</a> |
+            <a href="/delete/collection/{{c.id}}">Delete</a>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Expenses</h3>
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Mode</th>
+        {% if session.get("admin") %}
+        <th>Action</th>{% endif %}
+    </tr>
+
+    {% for e in expenses %}
+    <tr>
+        <td>{{ e.date.strftime("%d-%m-%Y") }}</td>
+        <td>{{ e.name }}</td>
+        <td>{{ e.amount }}</td>
+        <td>{{ e.mode }}</td>
+        {% if session.get("admin") %}
+        <td>
+            <a href="/edit/expense/{{e.id}}">Edit</a> |
+            <a href="/delete/expense/{{e.id}}">Delete</a>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
