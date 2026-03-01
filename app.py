@@ -64,15 +64,31 @@ def dashboard():
     total_cash = 0
     total_online = 0
 
+    today_cash = 0
+    today_online = 0
+
+    today_date = datetime.now().date()
+
     for c in collections:
         mode = c.mode.strip().lower()
+
+        # Total calculation
         if mode == "cash":
             total_cash += c.amount
         elif mode == "online":
             total_online += c.amount
 
+        # Today's collection calculation
+        if c.date.date() == today_date:
+            if mode == "cash":
+                today_cash += c.amount
+            elif mode == "online":
+                today_online += c.amount
+
     total_expense = sum(e.amount for e in expenses)
     net = total_cash + total_online - total_expense
+
+    today_total = today_cash + today_online
 
     return render_template(
         "dashboard.html",
@@ -81,7 +97,10 @@ def dashboard():
         total_cash=total_cash,
         total_online=total_online,
         total_expense=total_expense,
-        net=net
+        net=net,
+        today_cash=today_cash,
+        today_online=today_online,
+        today_total=today_total
     )
 
 # ---------------------
@@ -182,3 +201,4 @@ def edit(type, id):
 
 if __name__ == "__main__":
     app.run()
+
