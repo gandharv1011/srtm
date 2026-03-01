@@ -114,6 +114,17 @@
         <h3>Total Online: ₹{{ total_online }}</h3>
         <h3>Total Expenses: ₹{{ total_expense }}</h3>
         <h3>Net Balance: ₹{{ net }}</h3>
+        <hr>
+
+<h3>📅 Today's Collection</h3>
+
+<div class="summary">
+    <h3>Today Cash: ₹{{ today_cash }}</h3>
+    <h3>Today Online: ₹{{ today_online }}</h3>
+    <h3>Today Total: ₹{{ today_total }}</h3>
+</div>
+
+<hr>
     </div>
 
     {% if session.get("admin") %}
