@@ -1,12 +1,22 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import os
 
 app = Flask(__name__)
-import os
 app.secret_key = os.urandom(24)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+# ---------------------
+# POSTGRESQL DATABASE CONFIG (Render)
+# ---------------------
+
+database_url = os.environ.get("DATABASE_URL")
+
+# Fix for Render old postgres:// format
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -31,13 +41,16 @@ class Expense(db.Model):
     date = db.Column(db.DateTime, default=datetime.now)
 
 
+# Create tables automatically
+with app.app_context():
+    db.create_all()
+
 # ---------------------
 # ADMIN LOGIN
 # ---------------------
 
 ADMIN_ID = "srtm"
 ADMIN_PASSWORD = "srtm1234"
-
 
 # ---------------------
 # DASHBOARD
@@ -59,7 +72,6 @@ def dashboard():
             total_online += c.amount
 
     total_expense = sum(e.amount for e in expenses)
-
     net = total_cash + total_online - total_expense
 
     return render_template(
@@ -71,7 +83,6 @@ def dashboard():
         total_expense=total_expense,
         net=net
     )
-
 
 # ---------------------
 # LOGIN
@@ -85,12 +96,10 @@ def login():
             return redirect("/")
     return render_template("login.html")
 
-
 @app.route("/logout")
 def logout():
     session.pop("admin", None)
     return redirect("/")
-
 
 # ---------------------
 # ADD COLLECTION
@@ -101,14 +110,13 @@ def add_collection():
     if "admin" in session:
         new = Collection(
             name=request.form["name"],
-            amount = float(request.form.get("amount", 0)),
+            amount=float(request.form.get("amount", 0)),
             mode=request.form["mode"],
             date=datetime.now()
         )
         db.session.add(new)
         db.session.commit()
     return redirect("/")
-
 
 # ---------------------
 # ADD EXPENSE
@@ -119,14 +127,13 @@ def add_expense():
     if "admin" in session:
         new = Expense(
             name=request.form["name"],
-            amount=float(request.form["amount"]),
+            amount=float(request.form.get("amount", 0)),
             mode=request.form["mode"],
             date=datetime.now()
         )
         db.session.add(new)
         db.session.commit()
     return redirect("/")
-
 
 # ---------------------
 # DELETE
@@ -145,9 +152,8 @@ def delete(type, id):
 
     return redirect("/")
 
-
 # ---------------------
-# EDIT (INCLUDING DATE)
+# EDIT
 # ---------------------
 
 @app.route("/edit/<type>/<int:id>", methods=["GET", "POST"])
@@ -162,23 +168,17 @@ def edit(type, id):
 
     if request.method == "POST":
         item.name = request.form["name"]
-        item.amount = float(request.form["amount"])
+        item.amount = float(request.form.get("amount", 0))
         item.mode = request.form["mode"]
-
-        # Convert date string to datetime
         item.date = datetime.strptime(request.form["date"], "%Y-%m-%d")
-
         db.session.commit()
         return redirect("/")
 
     return render_template("edit.html", item=item, type=type)
 
-
 # ---------------------
-# RUN APP
+# RUN
 # ---------------------
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    app.run()
