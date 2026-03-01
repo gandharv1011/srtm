@@ -56,6 +56,8 @@ ADMIN_PASSWORD = "srtm1234"
 # DASHBOARD
 # ---------------------
 
+from datetime import datetime, date
+
 @app.route("/")
 def dashboard():
     collections = Collection.query.all()
@@ -67,18 +69,18 @@ def dashboard():
     today_cash = 0
     today_online = 0
 
-    today_date = datetime.now().date()
+    today_date = date.today()
 
     for c in collections:
         mode = c.mode.strip().lower()
 
-        # Total calculation
+        # TOTAL CALCULATION
         if mode == "cash":
             total_cash += c.amount
         elif mode == "online":
             total_online += c.amount
 
-        # Today's collection calculation
+        # TODAY CALCULATION
         if c.date.date() == today_date:
             if mode == "cash":
                 today_cash += c.amount
@@ -87,7 +89,6 @@ def dashboard():
 
     total_expense = sum(e.amount for e in expenses)
     net = total_cash + total_online - total_expense
-
     today_total = today_cash + today_online
 
     return render_template(
@@ -102,6 +103,7 @@ def dashboard():
         today_online=today_online,
         today_total=today_total
     )
+      
 
 # ---------------------
 # LOGIN
@@ -201,4 +203,5 @@ def edit(type, id):
 
 if __name__ == "__main__":
     app.run()
+
 
