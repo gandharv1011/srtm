@@ -1,137 +1,223 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>RAM NAVMI 2026</title>
+    <title>Ram Navmi 2026</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fffaf3;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h2 {
+            text-align: center;
+            font-size: 36px;
+            color: #FF6F00;
+            margin-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #FF6F00;
+            font-weight: 600;
+        }
+        
+        .summary {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        input,
+        select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background-color: #FF6F00;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background-color: #e65c00;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        th {
+            background-color: #FF6F00;
+            color: white;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 8px;
+            text-align: center;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        #searchInput {
+            padding: 8px;
+            width: 250px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2 style="color: #FF9933; text-align: center; font-size: 32px;">
-    🚩 RAM NAVMI 2026
-</h2>
+    <div class="top-bar">
+        <h2>🚩 RAM NAVMI 2026</h2>
+        {% if session.get("admin") %}
+        <a href="/logout">Logout</a> {% else %}
+        <a href="/login">Login</a> {% endif %}
+    </div>
 
-{% if session.get("admin") %}
-<a href="/logout">Logout</a>
-{% else %}
-<a href="/login">Login</a>
-{% endif %}
+    <div class="summary">
+        <h3>Total Cash: ₹{{ total_cash }}</h3>
+        <h3>Total Online: ₹{{ total_online }}</h3>
+        <h3>Total Expenses: ₹{{ total_expense }}</h3>
+        <h3>Net Balance: ₹{{ net }}</h3>
+    </div>
 
-<hr>
-
-<h3>Total Cash: ₹{{ total_cash }}</h3>
-<h3>Total Online: ₹{{ total_online }}</h3>
-<h3>Total Expenses: ₹{{ total_expense }}</h3>
-<h3>Net Balance: ₹{{ net }}</h3>
-
-<hr>
-
-{% if session.get("admin") %}
-<h3>Add Collection</h3>
-<form method="POST" action="/add_collection">
-    <input name="name" placeholder="Name" required><br><br>
-    <input name="amount" placeholder="Amount" required><br><br>
-    <select name="mode" required>
+    {% if session.get("admin") %}
+    <h3>Add Collection</h3>
+    <form method="POST" action="/add_collection">
+        <input name="name" placeholder="Name" required>
+        <input name="amount" placeholder="Amount" required>
+        <select name="mode" required>
         <option value="Cash">Cash</option>
         <option value="Online">Online</option>
-    </select><br><br>
-    <button type="submit">Add</button>
-</form>
+    </select>
+        <button type="submit">Add</button>
+    </form>
 
-<h3>Add Expense</h3>
-<form method="POST" action="/add_expense">
-    <input name="name" placeholder="Name" required><br><br>
-    <input name="amount" placeholder="Amount" required><br><br>
-    <select name="mode" required>
+    <br>
+
+    <h3>Add Expense</h3>
+    <form method="POST" action="/add_expense">
+        <input name="name" placeholder="Name" required>
+        <input name="amount" placeholder="Amount" required>
+        <select name="mode" required>
         <option value="Cash">Cash</option>
         <option value="Online">Online</option>
-    </select><br><br>
-    <button type="submit">Add</button>
-</form>
+    </select>
+        <button type="submit">Add</button>
+    </form>
 
-<hr>
-{% endif %}
+    <br> {% endif %}
 
-<!-- 🔍 SEARCH BAR -->
-<h3>Search Records</h3>
-<input type="text" id="searchInput" placeholder="Search by name..." 
-       onkeyup="searchTable()" 
-       style="padding:6px; width:250px;">
+    <h3>Search Records</h3>
+    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchTable()">
 
-<hr>
+    <br><br>
 
-<h3>Collections</h3>
-<table border="1" width="100%">
-    <tr>
-        <th>Date</th>
-        <th>Name</th>
-        <th>Amount</th>
-        <th>Mode</th>
-        {% if session.get("admin") %}
-        <th>Action</th>
-        {% endif %}
-    </tr>
+    <h3>Collections</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Mode</th>
+            {% if session.get("admin") %}
+            <th>Action</th>
+            {% endif %}
+        </tr>
+        {% for c in collections %}
+        <tr>
+            <td>{{ c.date.strftime("%d-%m-%Y") }}</td>
+            <td>{{ c.name }}</td>
+            <td>{{ c.amount }}</td>
+            <td>{{ c.mode }}</td>
+            {% if session.get("admin") %}
+            <td>
+                <a href="/edit/collection/{{c.id}}">Edit</a> |
+                <a href="/delete/collection/{{c.id}}">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
 
-    {% for c in collections %}
-    <tr>
-        <td>{{ c.date.strftime("%d-%m-%Y") }}</td>
-        <td>{{ c.name }}</td>
-        <td>{{ c.amount }}</td>
-        <td>{{ c.mode }}</td>
-        {% if session.get("admin") %}
-        <td>
-            <a href="/edit/collection/{{c.id}}">Edit</a> |
-            <a href="/delete/collection/{{c.id}}">Delete</a>
-        </td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</table>
+    <h3>Expenses</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Mode</th>
+            {% if session.get("admin") %}
+            <th>Action</th>
+            {% endif %}
+        </tr>
+        {% for e in expenses %}
+        <tr>
+            <td>{{ e.date.strftime("%d-%m-%Y") }}</td>
+            <td>{{ e.name }}</td>
+            <td>{{ e.amount }}</td>
+            <td>{{ e.mode }}</td>
+            {% if session.get("admin") %}
+            <td>
+                <a href="/edit/expense/{{e.id}}">Edit</a> |
+                <a href="/delete/expense/{{e.id}}">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
 
-<br>
+    <script>
+        function searchTable() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let tables = document.querySelectorAll("table");
 
-<h3>Expenses</h3>
-<table border="1" width="100%">
-    <tr>
-        <th>Date</th>
-        <th>Name</th>
-        <th>Amount</th>
-        <th>Mode</th>
-        {% if session.get("admin") %}
-        <th>Action</th>
-        {% endif %}
-    </tr>
+            tables.forEach(table => {
+                let rows = table.getElementsByTagName("tr");
 
-    {% for e in expenses %}
-    <tr>
-        <td>{{ e.date.strftime("%d-%m-%Y") }}</td>
-        <td>{{ e.name }}</td>
-        <td>{{ e.amount }}</td>
-        <td>{{ e.mode }}</td>
-        {% if session.get("admin") %}
-        <td>
-            <a href="/edit/expense/{{e.id}}">Edit</a> |
-            <a href="/delete/expense/{{e.id}}">Delete</a>
-        </td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</table>
-
-<!-- 🔥 SEARCH SCRIPT -->
-<script>
-function searchTable() {
-    let input = document.getElementById("searchInput").value.toLowerCase();
-    let tables = document.querySelectorAll("table");
-
-    tables.forEach(table => {
-        let rows = table.getElementsByTagName("tr");
-
-        for (let i = 1; i < rows.length; i++) {
-            let text = rows[i].innerText.toLowerCase();
-            rows[i].style.display = text.includes(input) ? "" : "none";
+                for (let i = 1; i < rows.length; i++) {
+                    let text = rows[i].innerText.toLowerCase();
+                    rows[i].style.display = text.includes(input) ? "" : "none";
+                }
+            });
         }
-    });
-}
-</script>
+    </script>
 
 </body>
+
 </html>
